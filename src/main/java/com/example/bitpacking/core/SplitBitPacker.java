@@ -2,7 +2,7 @@ package com.example.bitpacking.core;
 import com.example.bitpacking.api.BitPacker;
 
 
-public class OverflowBitPacker implements BitPacker {
+public class SplitBitPacker implements BitPacker {
     
 @Override
     public BitPackedArray compress(int[] tab) {
@@ -43,7 +43,6 @@ public class OverflowBitPacker implements BitPacker {
                 words[wordIndex] |= (int) (val << bitOffset);
             } else {
                 int lowBits = bitsInCurrentWord;
-                int highBits = k - lowBits;
 
                 long lowPart = (val & (1L << k) - 1) & ((1L << lowBits) - 1);
                 long highPart = (val & (1L << k) - 1) >>> lowBits;
@@ -77,7 +76,7 @@ public class OverflowBitPacker implements BitPacker {
             if (bitOffset + k <= 32) {
             // Tout tient dans un seul mot
                 int word = words[wordIndex];
-                int mask = (k == 32) ? -1 : (1 << k) - 1;
+                int mask = (k == 32) ? -1 : (1 << k) - 1;  // masque k bits (suite de k 1 permettant de ne retirer après le & que les k bit qu'on veut)
                 output[i] = (word >>> bitOffset) & mask;
             } else {
             // La valeur est à cheval sur deux mots même principe que dans get
@@ -109,7 +108,7 @@ public class OverflowBitPacker implements BitPacker {
         if (bitOffset + k <= 32) {
             // Cas simple: tous les bits sont dans le même mot
             int word = words[wordIndex];
-            int mask = (k == 32) ? -1 : ((1 << k) - 1);   // masque k bits 
+            int mask = (k == 32) ? -1 : ((1 << k) - 1);   // masque k bits (suite de k 1 permettant de ne retirer après le & que les k bit qu'on veut)
             return (word >>> bitOffset) & mask;
         } else {
             // Cas de chevauchement sur deux mots
