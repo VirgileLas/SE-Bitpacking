@@ -2,6 +2,7 @@ package com.example.bitpacking.factory;
 
 import com.example.bitpacking.api.BitPacker;
 import com.example.bitpacking.core.NoSplitBitPacker;
+import com.example.bitpacking.core.OverflowBitPacker;
 import com.example.bitpacking.core.SplitBitPacker;
 
 
@@ -19,8 +20,7 @@ public final class BitPackerFactory {
             case "nosplit":
                 return new NoSplitBitPacker();
             case "overflow":
-                // return new OverflowBitPacker();
-                throw new UnsupportedOperationException("Overflow not implemented yet");
+                return new OverflowBitPacker();
             default:
                 throw new IllegalArgumentException("Unknown mode '"+mode+"'. Use: split|nosplit|overflow");
         }

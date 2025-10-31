@@ -7,6 +7,10 @@ public class SplitBitPacker implements BitPacker {
 @Override
     public BitPackedArray compress(int[] tab) {
         int n = tab.length;
+        if (n == 0) {
+            // Tableau d'entrée vide -> retour d'un BitPackedArray vide
+            return new BitPackedArray(new int[0], 0, 0);
+        }
         // Calcul de k = nombre de bits nécessaires pour représenter la valeur maximale
         int max = 0;
         for (int val : tab) {

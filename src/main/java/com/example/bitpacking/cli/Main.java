@@ -40,10 +40,12 @@ public class Main {
         System.out.println("Mode        : " + mode);
         System.out.println("Input size  : " + input.length);
         System.out.println("Input (head): " + head(input, 16));
-
         System.out.println();
         System.out.println("Compressed:");
         System.out.println("  n = " + compressed.n() + " | k = " + compressed.k() + " | words.length = " + compressed.words().length);
+        if (packer instanceof OverflowBitPacker) {
+            System.out.println("  overflowStartBit = " + compressed.overflowStartBit() + " | kOverflow = " + compressed.kOverflow() + " | overflowCount = " + compressed.overflowCount() + " | kIndex = " + compressed.kIndex());
+        }
         System.out.println("  words (int): " + Arrays.toString(compressed.words()));
         System.out.println("  words (bin):");
         for (int i = 0; i < compressed.words().length; i++) {
@@ -58,16 +60,24 @@ public class Main {
         System.out.printf("Timing      : compress=%.3f ms | decompress=%.3f ms%n",
                 (t1 - t0)/1e6, (t2 - t1)/1e6);
 
-        // ---- Tests get() sur quelques indices (début / milieu / fin)
+       // ---- Tests get() sur tous les indices ----
         if (input.length > 0) {
-            int[] probes = probeIndices(input.length);
             System.out.println();
-            System.out.println("get() checks:");
-            for (int idx : probes) {
+            System.out.println("get() full check:");
+            boolean allOk = true;
+
+            for (int idx = 0; idx < input.length; idx++) {
                 int got = packer.get(compressed, idx);
-                System.out.printf("  get(%d) = %d %s%n", idx, got, (got == input[idx] ? "✓" : "✗"));
+                boolean ok2 = (got == input[idx]);
+                if (!ok2) allOk = false;
+                System.out.printf("  get(%d) = %d %s%n", idx, got, ok2? "✓" : "✗");
             }
+
+        System.out.println();
+        System.out.println(allOk ? "✅ Tous les indices sont corrects."
+                             : "❌ Des divergences ont été détectées.");
         }
+
 
         // ---- Optionnel: afficher l’input en binaire 32 bits (si tu veux)
         // System.out.println("\nInput (bin 32):");
@@ -110,17 +120,4 @@ public class Main {
         return s.substring(0,8) + "_" + s.substring(8,16) + "_" + s.substring(16,24) + "_" + s.substring(24,32);
     }
 
-    private static int[] probeIndices(int n) {
-        if (n == 1) return new int[]{0};
-        if (n == 2) return new int[]{0,1};
-        int mid = n / 2;
-        int last = n - 1;
-        // Quelques indices variés et sûrs
-        int i2 = Math.min(2, last);
-        int i3 = Math.min(3, last);
-        return Arrays.stream(new int[]{0, 1, i2, i3, mid, Math.max(mid-1,0), last-1, last})
-                .distinct()
-                .sorted()
-                .toArray();
-    }
 }
