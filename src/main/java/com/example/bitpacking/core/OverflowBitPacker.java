@@ -37,11 +37,11 @@ public class OverflowBitPacker implements BitPacker {
             running += bitLenFreq[b];
         }
 
-        // Recherche du meilleur k_small par balayage de 1 à k_overflow (<=32)
+        // Recherche du meilleur k_minim par balayage de 1 à k_overflow (<=32)
         long bestCost = Long.MAX_VALUE;
         int best_k_small = 1; // nombre de bits pour les valeurs non overflow
         int best_k_index = 0; // nb de bits nécessaires pour indexer m overflows
-        int best_k_payload = 0; // max(k_index, k_small)
+        int best_k_payload = 0; // max(k_index, k_minim)
         int best_k_total = 0; // k_payload + 1 (flag)
         int best_m = 0; // nombre de valeurs overflow
 
@@ -98,12 +98,12 @@ public class OverflowBitPacker implements BitPacker {
         }
 
         //Compression en utilisant les paramètres optimaux trouvés
-        int k_small = best_k_small;
+        int k_minim = best_k_small;
         int k_index = best_k_index;
         int k_payload = best_k_payload;
         int k_total = best_k_total;
         int m = best_m;
-        long threshold = ((1L << k_small) - 1);
+        long threshold = ((1L << k_minim) - 1);
         
         // Allouer le tableau de mots de sortie d'une taille suffisante pour les deux zones
         int valuesPerWordMain = Math.max(1, 32 / k_total);
