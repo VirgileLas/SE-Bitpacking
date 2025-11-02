@@ -44,7 +44,6 @@ mvn clean compile
 ---
 Exécuter tous les tests JUnit 5 :
 mvn clean test
-
 Les rapports se trouvent dans : target/surefire-reports/
 
 
